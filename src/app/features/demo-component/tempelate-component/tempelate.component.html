@@ -1,0 +1,154 @@
+<ng-container *ngFor="let config of data">
+  <!-- Switch cases -->
+  <ng-container [ngSwitch]="config.type">
+    <!-- /***********************Dynamic Form***************************/ -->
+    <div *ngSwitchCase="'formElements'">
+      <form *ngIf="form" [formGroup]="form" (ngSubmit)="submit()">
+        <div
+          class="row"
+          [ngClass]="isMob ? config.formMobileClass : config.formWebClass"
+        >
+          <ng-container *ngFor="let config of config.inputList">
+            <ng-container [ngSwitch]="config.type">
+              <div
+                *ngSwitchCase="'input'"
+                [ngClass]="
+                  isMob ? config.mobileContainerClass : config.webContainerClass
+                "
+              >
+                <mat-form-field
+                  [ngClass]="
+                    isMob
+                      ? config.mobileMatFormFieldClass
+                      : config.webMatFormFieldClass
+                  "
+                >
+                  <mat-label>{{ config.label }}</mat-label>
+                  <input
+                    matInput
+                    [type]="
+                      isMob ? config.mobileINputType : config.webInputType
+                    "
+                    [formControlName]="config.formControlName"
+                  />
+                </mat-form-field>
+              </div>
+              <div
+                *ngSwitchCase="'dropdown'"
+                [ngClass]="
+                  isMob ? config.mobileContainerClass : config.webContainerClass
+                "
+              >
+                <mat-form-field
+                  [ngClass]="
+                    isMob
+                      ? config.mobileMatFormFieldClass
+                      : config.webMatFormFieldClass
+                  "
+                >
+                  <mat-label>{{ config.label }}</mat-label>
+                  <mat-select [formControlName]="config.formControlName">
+                    <mat-option *ngFor="let val of config.values" [value]="val">
+                      {{ val[config.showProperty] }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div
+                *ngSwitchCase="'radio'"
+                [ngClass]="
+                  isMob ? config.mobileContainerClass : config.webContainerClass
+                "
+              >
+                <mat-radio-group [formControlName]="config.formControlName">
+                  <mat-radio-button
+                    [ngClass]="isMob ? val.mobileClass : val.webClass"
+                    *ngFor="let val of config.values"
+                    [value]="val.value"
+                    >{{ val.name }}
+                  </mat-radio-button>
+                </mat-radio-group>
+              </div>
+
+              <div
+                *ngSwitchCase="'checkbox'"
+                [ngClass]="
+                  isMob ? config.mobileContainerClass : config.webContainerClass
+                "
+                [formArrayName]="config.formControlName"
+              >
+                <div
+                  *ngFor="let val of config.values; let i = index"
+                  [formGroupName]="i"
+                >
+                  <mat-checkbox
+                    #ch
+                    formControlName="checkBoxData"
+                    (change)="
+                      materialChecked(ch, i, config.formControlName, val)
+                    "
+                  >
+                    <div
+                      webCheckBoxClass
+                      [ngClass]="
+                        isMob
+                          ? config.mobileCheckBoxClass
+                          : config.webCheckBoxClass
+                      "
+                      matTooltip=" {{ val[config.showProperty] }}"
+                    >
+                      {{ val[config.showProperty] }} <br />
+                    </div>
+                  </mat-checkbox>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+          <div
+            [ngClass]="isMob ? config.mobileSubmitClass : config.webSubmitClass"
+          >
+            <button>Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <!-- ************************************************************************** -->
+
+    <!-- /***********************Dynamic Table***************************/ -->
+    <table
+      *ngSwitchCase="'table'"
+      [ngClass]="isMob ? config.mobileClass : config.webClass"
+    >
+      <tr>
+        <th
+          [ngClass]="
+            isMob
+              ? config.content.header.mobileClass
+              : config.content.header.webClass
+          "
+          *ngFor="let col of config.content.header.colDefs.data"
+        >
+          {{ col.label }}
+        </th>
+      </tr>
+
+      <tr
+        [ngClass]="
+          isMob ? config.content.row.mobileClass : config.content.row.webClass
+        "
+        *ngFor="let row of config.content.row.rowDefs.data"
+      >
+        <td
+          [ngClass]="
+            isMob
+              ? config.content.row.mobileClass
+              : config.content.row.rowDefs.webClass
+          "
+          *ngFor="let col of config.content.header.colDefs.data"
+        >
+          {{ row[col.field] }}
+        </td>
+      </tr>
+    </table>
+  </ng-container>
+</ng-container>
